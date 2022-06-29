@@ -86,15 +86,19 @@ class URDFRobotModel(object):
             mass = torch.tensor(
                 [link.inertial.mass], dtype=torch.float32, device=self._device
             )
+            if link.inertial.origin is not None:
+                pos = link.inertial.origin.position
+            else:
+                pos = [0, 0, 0]
             com = (
-                torch.tensor(
-                    link.inertial.origin.position,
-                    dtype=torch.float32,
-                    device=self._device,
+                    torch.tensor(
+                        pos,
+                        dtype=torch.float32,
+                        device=self._device,
+                    )
+                    .reshape((1, 3))
+                    .to(self._device)
                 )
-                .reshape((1, 3))
-                .to(self._device)
-            )
 
             inert_mat = torch.zeros((3, 3), device=self._device)
             inert_mat[0, 0] = link.inertial.inertia.ixx
